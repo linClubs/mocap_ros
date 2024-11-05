@@ -44,7 +44,7 @@ H1Teleop::H1Teleop() : Node("h1_node")
 }
 
 void H1Teleop::timer_callback()
-{   // 1 update data
+{   // 1 get mocap data
     // 34, 8 + 1(left_hand) + 12(left_fingers) + 1(right_hand) + 12(right_fingers)
     // upJoints[[8], [21]] = 0, upJoints[9->20](left_thumb 9->12, left_index->little 13->20) 
     auto upJoints = mocap->getJoints();
@@ -52,37 +52,45 @@ void H1Teleop::timer_callback()
     // 2 finger data process
     // 2.1 left_finger, qcmd[litte, ring, middle, index, thumb_1, thumb_2]
     //  qcmd[0, 1, 2, 3] -> upJoints[20, 18, 16, 14],  // little -> index    
-    qcmd(4) = 1.2 -  upJoints[9];   // 大拇指
-    qcmd(5) = 0.5 -  upJoints[10];   // 大拇指
+    qcmd(4) = 1.2 -  upJoints[9] / 1.2;   
+    qcmd(5) = 0.5 -  upJoints[10] / 0.7;   
     for(int i = 0; i < 4; i++)
     { 
-      qcmd(i) =1.7 - upJoints[20 - i * 2]; 
+      qcmd(i) =1 - upJoints[20 - i * 2] / 1.7; 
     }
 
     // 2.2 right_finger
     // qcmd[10, 11] -> upJoints[22, 23, 24, 25]
-    qcmd(10) = 1.2 -  upJoints[22];   // 大拇指
-    qcmd(11) = 0.5 -  upJoints[23];   // 大拇指
+    qcmd(10) = 1 -  upJoints[22] / 1.2;   
+    qcmd(11) = 1 -  upJoints[23] / 0.6;   
     // qcmd[6, 7, 8, 9] -> upJoints[33, 31, 29, 27]
     for(int i = 0; i < 4; i++)
     { 
-      qcmd(6 + i) =1.7 - upJoints[33 - i * 2]; 
+      qcmd(6 + i) =1 - upJoints[33 - i * 2] / 1.7; 
     }
     
-    // 手指部分 更新qcmd
+      std::cout << "finger  : ";
+    for(int i = 0; i < 12; ++i)
+    {
+      std::cout << qcmd(i) << "  ";
+    }
+    std::cout << std::endl;
+
+    // 2.3 publish finger signal 
     lefthand->SetPosition(qcmd.block<6, 1>(0, 0));
     righthand->SetPosition(qcmd.block<6, 1>(6, 0));
 
-    // 手臂处理
+    // 3 arm data process
+    // 3.1 update arm data
     for(int i = 0; i < 8; ++i)
     {
       next_arm_q_[i+12] = upJoints[i]; 
     }
 
-    // 4 手臂unitree消息 20维
+    // 3.2 define unitree_go ros2_msg , 20dims
     unitree_go::msg::MotorCmds bodyCmdsMsg;
     unitree_go::msg::MotorCmd bodyCmd;
-    // 4.1 身体的20个关节赋值kp和kd, initialize 20个关节, 12-19总共8个kp=60，kd = 1.5，id=9的qpos=1
+    // 3.2.1 身体的20个关节赋值kp和kd, initialize 20个关节, 12-19总共8个kp=60，kd = 1.5，id=9的qpos=1
     for (int i = 0; i < 20; ++i) 
     {
         bodyCmd.kp = (i >= 12 && i <20) ? 60 : 0.0;
@@ -91,14 +99,16 @@ void H1Teleop::timer_callback()
     }
     bodyCmdsMsg.cmds[9].q = 1.0;
 
-    std::cout << "arm  : ";
+  //  std::cout << "arm  : ";
     for (int j = 12; j < 20; ++j) 
     {
       bodyCmdsMsg.cmds[arm_joints.at(j-12)].q = next_arm_q_.at(j) ;
-      std::cout << next_arm_q_.at(j) << "  ";
+      // std::cout << next_arm_q_.at(j) << "  ";
     }
-    std::cout << std::endl;
-    pub_arm_->publish(bodyCmdsMsg);
+    // std::cout << std::endl;
+
+    // 3.3 publish arm control signal
+    // pub_arm_->publish(bodyCmdsMsg);
    
    // std::this_thread::sleep_for(std::chrono::milliseconds(1));
 };
