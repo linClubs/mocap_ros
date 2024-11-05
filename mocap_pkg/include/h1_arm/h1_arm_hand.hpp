@@ -31,7 +31,7 @@ private:
     rclcpp::Publisher<unitree_go::msg::MotorCmds>::SharedPtr pub_arm_;
     rclcpp::Publisher<unitree_go::msg::MotorCmds>::SharedPtr pub_head_;
     
-    // rclcpp::Publisher<unitree_go::msg::MotorCmds>::SharedPtr pub_hand_;
+    rclcpp::Publisher<unitree_go::msg::MotorCmds>::SharedPtr pub_hand_;
     
     // rclcpp::Subscription<unitree_go::msg::LowState>::SharedPtr lowStateSub_;
     // rclcpp::Publisher<sensor_msgs::msg::JointState>::SharedPtr pub_joint_states_;
