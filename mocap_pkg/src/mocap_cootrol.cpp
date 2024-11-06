@@ -46,9 +46,10 @@ void H1Teleop::timer_callback()
 
     // 2 finger data process
     // 2.1 left_finger, qcmd[litte, ring, middle, index, thumb_1, thumb_2]
+    // qcmd(4, 5) -> upJoints[9, 10, 11, 12]
+    qcmd(4) = 1 -  upJoints[11] / 1.2;   
+    qcmd(5) = 1 -  upJoints[12] / 0.8;
     //  qcmd[0, 1, 2, 3] -> upJoints[20, 18, 16, 14],  // little -> index    
-    qcmd(4) = 1.2 -  upJoints[9] / 1.2;   
-    qcmd(5) = 0.5 -  upJoints[10] / 0.7;   
     for(int i = 0; i < 4; i++)
     { 
       qcmd(i) =1 - upJoints[20 - i * 2] / 1.7; 
@@ -56,8 +57,8 @@ void H1Teleop::timer_callback()
 
     // 2.2 right_finger
     // qcmd[10, 11] -> upJoints[22, 23, 24, 25]
-    qcmd(10) = 1 -  upJoints[22] / 1.2;   
-    qcmd(11) = 1 -  upJoints[23] / 0.6;   
+    qcmd(10) = 1 -  upJoints[24] / 1.2;   
+    qcmd(11) = 1 -  upJoints[25] / 0.6;   
     // qcmd[6, 7, 8, 9] -> upJoints[33, 31, 29, 27]
     for(int i = 0; i < 4; i++)
     { 
@@ -70,6 +71,7 @@ void H1Teleop::timer_callback()
     // 2.3 publish finger signal 
     unitree_go::msg::MotorCmds handCmdsMsg;
     unitree_go::msg::MotorCmd handCmd;
+
     for(int i = 0; i < 12; ++i)
     {
       handCmd.kp = 60;
