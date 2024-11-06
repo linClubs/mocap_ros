@@ -54,12 +54,12 @@ find_package(unitree_go REQUIRED)
 add_executable(h1_arm_hand src/h1_arm_hand.cpp)
 ament_target_dependencies(h1_arm_hand rclcpp unitree_go)
 
-add_executable(mocap_cootrol src/mocap_cootrol.cpp)
-ament_target_dependencies(mocap_cootrol rclcpp unitree_go)
+add_executable(mocap_control src/mocap_control.cpp)
+ament_target_dependencies(mocap_control rclcpp unitree_go)
 
 install(
   TARGETS
   h1_arm_hand
-  mocap_cootrol
+  mocap_control
   DESTINATION lib/${PROJECT_NAME}
 )
