@@ -73,24 +73,26 @@ void H1Teleop::timer_callback()
     unitree_go::msg::MotorCmd handCmd;
 
     for(int i = 0; i < 12; ++i)
-    {
-      handCmd.kp = 60;
-      handCmd.kd = 0.5;
+    { 
+      handCmd.mode = 0;
+      handCmd.kp = 0;
+      handCmd.kd = 0;
       handCmd.q = qcmd(i);
       handCmdsMsg.cmds.push_back(handCmd);
       std::cout << qcmd(i) << "  ";
     }
     std::cout << std::endl;
 
-    pub_hand_->publish(handCmdsMsg);
+    
 
 
 
     // 3 arm data process
     // 3.1 update arm data
+    std::vector<float> arm_q(20, 0.0);
     for(int i = 0; i < 8; ++i)
     {
-      next_arm_q_[i+12] = upJoints[i]; 
+      arm_q[i+12] = upJoints[i]; 
     }
 
     // 3.2 define unitree_go ros2_msg , 20dims
@@ -105,15 +107,16 @@ void H1Teleop::timer_callback()
     }
     bodyCmdsMsg.cmds[9].q = 1.0;
 
-  //  std::cout << "arm  : ";
+   std::cout << "arm  : ";
     for (int j = 12; j < 20; ++j) 
     {
-      bodyCmdsMsg.cmds[arm_joints.at(j-12)].q = next_arm_q_.at(j) ;
-      // std::cout << next_arm_q_.at(j) << "  ";
+      bodyCmdsMsg.cmds[arm_joints.at(j-12)].q = arm_q.at(j) ;
+      std::cout << arm_q.at(j) << "  ";
     }
-    // std::cout << std::endl;
+    std::cout << std::endl;
 
     // 3.3 publish arm control signal
+    pub_hand_->publish(handCmdsMsg);
     // pub_arm_->publish(bodyCmdsMsg);
    
    // std::this_thread::sleep_for(std::chrono::milliseconds(1));

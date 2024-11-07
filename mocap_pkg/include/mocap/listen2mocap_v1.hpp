@@ -136,12 +136,12 @@ public:
             auto [isSucL, resL] = sphere2hingeLeft(upperVecL, lowerVecL, initialGuessL);
             auto [isSucR, resR] = sphere2hingeRight(upperVecR, lowerVecR, initialGuessR);
             
-            std::vector<float> _upJoints{0, 0, 0, 0, 0, 0, 0, 0,
-                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+            // std::vector<float> _upJoints{0, 0, 0, 0, 0, 0, 0, 0,
+            //                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            //                     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-            // {
-            //     std::lock_guard<std::mutex> lock(jointsMutex);
+            {
+                std::lock_guard<std::mutex> lock(jointsMutex);
                 if (isSucL)
                 {
                     initialGuessL = resL;
@@ -149,8 +149,8 @@ public:
                     {
                         upJoints[i] = resL[i];
                     }
-                    _upJoints[3] += PI / 2.0 - 0.2;
-                    _upJoints[1] += 0.1;
+                    upJoints[3] += PI / 2.0 - 0.2;
+                    upJoints[1] += 0.1;
                 }
                 else
                 {
@@ -166,8 +166,8 @@ public:
                     {
                         upJoints[i + 4] = resR[i];
                     }
-                    _upJoints[7] += PI / 2.0 - 0.2;
-                    _upJoints[5] -= 0.2;
+                    upJoints[7] += PI / 2.0 - 0.2;
+                    upJoints[5] -= 0.2;
                 }
                 else
                 {
@@ -175,7 +175,7 @@ public:
                     std::cout << upperVecR.transpose() << "\n"
                               << lowerVecR.transpose() << std::endl;
                 }
-            // }
+            }
             
             // get left hand joints up position
             seq = 0;
@@ -208,7 +208,7 @@ public:
             localHandRots[19] = globalHandRots[18].transpose() * globalHandRots[19]; // pinky 3
 
             // get hand joints up position
-            _upJoints[8] = 0; // left hand joint
+            upJoints[8] = 0; // left hand joint
             // for loop to calculate angles
             Eigen::Vector3d newAxis;
             double newAngle = 0;
@@ -220,15 +220,15 @@ public:
                 // std::cout << i << ":" << newAngle << " " << std::endl;
             }
 
-            _upJoints[9] = 0.2;                                 // thumb prox pitch
-            _upJoints[10] = clamp(abs_(handSim[1]), -0.1, 0.6); // thumb prox yaw
-            _upJoints[11] = clamp(abs_(handSim[2]), 0, 0.8);    // thumb prox inter
-            _upJoints[12] = clamp(abs_(handSim[3]), 0, 1.2);    // thumb prox distal
+            upJoints[9] = 0.2;                                 // thumb prox pitch
+            upJoints[10] = clamp(abs_(handSim[1]), -0.1, 0.6); // thumb prox yaw
+            upJoints[11] = clamp(abs_(handSim[2]), 0, 0.8);    // thumb prox inter
+            upJoints[12] = clamp(abs_(handSim[3]), 0, 1.2);    // thumb prox distal
 
             for (int i = 0; i < 4; i++)
             {
-                _upJoints[13 + i * 2] = clamp(abs_(handSim[5 + i * 4]), 0, 1.7); // index inter
-                _upJoints[14 + i * 2] = clamp(abs_(handSim[6 + i * 4]), 0, 1.7); // index distal
+                upJoints[13 + i * 2] = clamp(abs_(handSim[5 + i * 4]), 0, 1.7); // index inter
+                upJoints[14 + i * 2] = clamp(abs_(handSim[6 + i * 4]), 0, 1.7); // index distal
             }
 
             // get right hand joints up position
@@ -262,7 +262,7 @@ public:
             localHandRots[19] = globalHandRots[18].transpose() * globalHandRots[19]; // pinky 3
 
             // get hand joints up position
-            _upJoints[21] = 0; // right hand joint
+            upJoints[21] = 0; // right hand joint
 
             for (int i = 0; i < 20; i++)
             {
@@ -272,24 +272,24 @@ public:
                 // std::cout << "right hand: ";
                 // std::cout << i << ":" << newAngle << " " << std::endl;
             }
-            _upJoints[22] = 0.2;                            // thumb prox pitch
-            _upJoints[23] = clamp((handSim[1]), -0.1, 0.6); // thumb prox yaw
-            _upJoints[24] = clamp(handSim[2], 0, 0.8);      // thumb prox inter
-            _upJoints[25] = clamp(handSim[3], 0, 1.2);      // thumb prox distal
+            upJoints[22] = 0.2;                            // thumb prox pitch
+            upJoints[23] = clamp((handSim[1]), -0.1, 0.6); // thumb prox yaw
+            upJoints[24] = clamp(handSim[2], 0, 0.8);      // thumb prox inter
+            upJoints[25] = clamp(handSim[3], 0, 1.2);      // thumb prox distal
 
             for (int i = 0; i < 4; i++)
             {
-                _upJoints[26 + i * 2] = clamp(handSim[5 + i * 4], 0, 1.7); // index inter
-                _upJoints[27 + i * 2] = clamp(handSim[6 + i * 4], 0, 1.7); // index distal
+                upJoints[26 + i * 2] = clamp(handSim[5 + i * 4], 0, 1.7); // index inter
+                upJoints[27 + i * 2] = clamp(handSim[6 + i * 4], 0, 1.7); // index distal
             }
 
-            {
-            std::lock_guard<std::mutex> lock(jointsMutex);
-            for(int i = 0; i < _upJoints.size(); ++i)
-            {
-                upJoints[i] = _upJoints[i];
-            }
-            }
+            // {
+            // std::lock_guard<std::mutex> lock(jointsMutex);
+            // for(int i = 0; i < _upJoints.size(); ++i)
+            // {
+            //     upJoints[i] = _upJoints[i];
+            // }
+            // }
         }
 
         send_command(sock_data, DATA_DISCONNECT_HEX, target_address);
