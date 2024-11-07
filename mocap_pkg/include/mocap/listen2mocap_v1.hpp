@@ -127,9 +127,11 @@ public:
             localRots[10] = globalRots[9].transpose() * globalRots[10];
             localRots[11] = globalRots[10].transpose() * globalRots[11];
             
+            
             // 左右
             upperVecR = simMatrix * localRots[2] * Eigen::Vector3d(1, 0, 0);
             lowerVecR = simMatrix * localRots[2] * localRots[3] * Eigen::Vector3d(1, 0, 0);
+            
             upperVecL = simMatrix * localRots[4] * Eigen::Vector3d(-1, 0, 0);
             lowerVecL = simMatrix * localRots[4] * localRots[5] * Eigen::Vector3d(-1, 0, 0);
 

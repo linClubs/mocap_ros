@@ -12,7 +12,6 @@
 #include "mocap/mocap.hpp"
 #include "h1_arm/h1_arm_hand.hpp"
 
-
 H1Teleop::H1Teleop() : Node("h1_node")
 { 
   next_arm_q_ = std::vector<float>(20, 0.);

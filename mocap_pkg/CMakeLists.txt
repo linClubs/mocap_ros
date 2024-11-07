@@ -57,8 +57,8 @@ ament_target_dependencies(h1_arm_hand rclcpp unitree_go)
 add_executable(mocap_control src/mocap_control.cpp)
 ament_target_dependencies(mocap_control rclcpp unitree_go)
 
-add_executable(mocap_control_hand src/mocap_control_hand.cpp)
-ament_target_dependencies(mocap_control_hand rclcpp unitree_go)
+add_executable(mocap_control_arm src/mocap_control_arm.cpp)
+ament_target_dependencies(mocap_control_arm rclcpp unitree_go)
 
 
 add_executable(mocap_control_finger src/mocap_control_finger.cpp)
